@@ -44,10 +44,7 @@
 	 !-->
 	<target name="check.jboss">
 		<condition property="jboss.home.exists">
-			<and>
-      			<available file="${jboss.home}" type="dir"/>
-	      		<available file="${sample.deploy}" type="dir"/>
-			</and>
+			<available file="${jboss.home}" type="dir"/>
     	</condition>
 	</target>
 	
@@ -58,7 +55,7 @@
 		<echo level="error" message="==============================================================================="/>
 	    <echo level="error" message="  FATAL BUILD ERROR"/>
 	    <echo level="error" message="  "/>
-		<echo level="error" message="  Directory '${jboss.home}' (or '${sample.deploy}') doesn't exist."/>
+		<echo level="error" message="  Directory '${jboss.home}' doesn't exist."/>
 		<echo level="error" message="  Please edit and fix your 'build.properties' configuration file."/>
 		<echo level="error" message="==============================================================================="/>
 	</target>

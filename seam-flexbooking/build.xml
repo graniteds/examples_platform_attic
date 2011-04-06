@@ -37,6 +37,7 @@
 	    <echo message="  "/>
 	    <echo message="==============================================================================="/>
 
+		<mkdir dir="${sample.deploy}"/>
 		<copy todir="${sample.deploy}" file="jboss-seam-booking-ds.xml"/>
 		
 		<mkdir dir="${ear.dir}"/>
@@ -66,10 +67,7 @@
 	 !-->
 	<target name="check.jboss">
 		<condition property="jboss.home.exists">
-			<and>
-      			<available file="${jboss.home}" type="dir"/>
-	      		<available file="${sample.deploy}" type="dir"/>
-			</and>
+			<available file="${jboss.home}" type="dir"/>
     	</condition>
 	</target>
 	
