@@ -141,4 +141,25 @@
 		<echo level="error" message="==============================================================================="/>
 	</target>
 	
+	<!--
+	 ! Make changes required by HTTPS.
+	 !-->	
+	<target name="configure.ssl">
+		<replace
+			file="war/WEB-INF/flex/services-config.xml"
+			token="mx.messaging.channels.AMFChannel"
+			value="mx.messaging.channels.SecureAMFChannel"
+		/>
+		<replace
+			file="war/WEB-INF/flex/services-config.xml"
+			token="http://{server.name}:{server.port}/{context.root}/graniteamf/amf"
+			value="https://{server.name}:{server.port}/{context.root}/graniteamf/amf"
+		/>
+		<replace
+			file="war/WEB-INF/flex/services-config.xml"
+			token="flex.messaging.endpoints.AMFEndpoint"
+			value="flex.messaging.endpoints.SecureAMFEndpoint"
+		/>
+	</target>
+	
 </project>

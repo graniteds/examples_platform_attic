@@ -14,7 +14,6 @@
 			import org.granite.tide.events.TideUIEvent;
 			import org.granite.tide.seam.Seam;
 			import org.granite.tide.seam.security.Identity;
-			import org.granite.tide.service.DefaultSecureServiceInitializer;
 			import org.granite.tide.service.DefaultServiceInitializer;
 			import org.jboss.seam.example.booking.User;
 			import org.jboss.seam.example.booking.control.HotelBookingModule;

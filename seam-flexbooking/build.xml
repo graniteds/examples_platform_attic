@@ -197,4 +197,14 @@
     	</condition>
 	</target>
 	
+	<!--
+	 ! Make changes required by HTTPS.
+	 !-->	
+	<target name="configure.ssl">
+		<replace
+			file="flex/BookingApp.mxml"
+			token="DefaultServiceInitializer"
+			value="DefaultSecureServiceInitializer"
+		/>
+	</target>
 </project>

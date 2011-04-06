@@ -133,4 +133,25 @@
 		<echo level="error" message="==============================================================================="/>
 	</target>
 	
+	<!--
+	 ! Make changes required by HTTPS.
+	 !-->	
+	<target name="configure.ssl">
+		<replace
+			file="war/WEB-INF/flex/services-config.xml"
+			token="org.granite.gravity.channels.GravityChannel"
+			value="org.granite.gravity.channels.SecureGravityChannel"
+		/>
+		<replace
+			file="war/WEB-INF/flex/services-config.xml"
+			token="http://{server.name}:{server.port}/{context.root}/gravity/amf"
+			value="https://{server.name}:{server.port}/{context.root}/gravity/amf"
+		/>
+		<replace
+			file="war/WEB-INF/flex/services-config.xml"
+			token="flex.messaging.endpoints.AMFEndpoint"
+			value="flex.messaging.endpoints.SecureAMFEndpoint"
+		/>
+	</target>
+	
 </project>
