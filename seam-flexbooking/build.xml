@@ -88,7 +88,7 @@
 	 !-->	
 	<target name="build.java">
 		<mkdir dir="${bin.java}"/>
-		<javac srcdir="${src.java}" destdir="${bin.java}">
+		<javac srcdir="${src.java}" destdir="${bin.java}" includeantruntime="false">
 			<classpath>
 				<fileset dir="lib">
 					<include name="ejb3-persistence.jar"/>

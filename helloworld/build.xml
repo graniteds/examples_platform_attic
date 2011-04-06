@@ -70,7 +70,7 @@
 	 !-->	
 	<target name="build.java">
 		<mkdir dir="${bin.java}"/>
-		<javac srcdir="${src.java}" destdir="${bin.java}"/>
+		<javac srcdir="${src.java}" destdir="${bin.java}" includeantruntime="false"/>
 	</target>
 	
 	<!--
