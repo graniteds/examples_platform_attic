@@ -4,7 +4,8 @@
     xmlns="*"
     xmlns:mx="http://www.adobe.com/2006/mxml"
     preinitialize="Seam.getInstance().initApplication();"
-    initialize="identity.isLoggedIn()">
+    initialize="identity.isLoggedIn()"
+	pageTitle="Flex Seam Booking Sample - GraniteDS">
 	
 	<mx:Style source="assets/screen.css" />
 
@@ -18,13 +19,13 @@
 			import org.jboss.seam.example.booking.User;
 			import org.jboss.seam.example.booking.control.HotelBookingModule;
             
+			Seam.getInstance().addComponentWithFactory("serviceInitializer", DefaultServiceInitializer, 
+				{ contextRoot: "/seam-flexbooking" });
 			/*
-			Seam.getInstance().addComponentWithFactory("serviceInitializer", DefaultServiceInitializer, 
-				{ contextRoot: "/seam-flexbooking" });
 			Alternate configuration for HTTPS (requires an APR+SSL setup).
-			*/
-			Seam.getInstance().addComponentWithFactory("serviceInitializer", DefaultServiceInitializer, 
+			Seam.getInstance().addComponentWithFactory("serviceInitializer", DefaultSecureServiceInitializer, 
 				{ contextRoot: "/seam-flexbooking" });
+			*/
             Seam.getInstance().addModule(HotelBookingModule);
 			
 			[In] [Bindable]

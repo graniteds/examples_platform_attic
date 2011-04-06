@@ -8,17 +8,10 @@
 
 	<property name="war.dir" value="${sample.deploy}/${sample.name}.war"/>
 
-	<!--
-	 ! Check JBoss installation directory.
-	 !-->
-	<target name="check.jboss">
-		<condition property="jboss.home.exists">
-			<and>
-      			<available file="${jboss.home}" type="dir"/>
-	      		<available file="${sample.deploy}" type="dir"/>
-			</and>
-    	</condition>
-	</target>
+	<property name="src.flex" value="flex"/>
+	<property name="src.java" value="java"/>
+	<property name="bin.flex" value="bin-flex"/>
+	<property name="bin.java" value="bin-java"/>
 	
 	<!--
 	 ! Build and deploy the sample application.
@@ -43,12 +36,24 @@
 		<mkdir dir="${war.dir}"/>
 		<copy todir="${war.dir}">
 			<fileset dir="war" includes="**"/>
-			<fileset dir="bin-flex" includes="**"/>
+			<fileset dir="${bin.flex}" includes="**" excludes="**/*.cache"/>
 		</copy>
 		<copy todir="${war.dir}/WEB-INF/classes">
-			<fileset dir="bin-java" includes="**"/>
+			<fileset dir="${bin.java}" includes="**"/>
 		</copy>
 		
+	</target>
+
+	<!--
+	 ! Check JBoss installation directory.
+	 !-->
+	<target name="check.jboss">
+		<condition property="jboss.home.exists">
+			<and>
+      			<available file="${jboss.home}" type="dir"/>
+	      		<available file="${sample.deploy}" type="dir"/>
+			</and>
+    	</condition>
 	</target>
 	
 	<!--
@@ -59,6 +64,82 @@
 	    <echo level="error" message="  FATAL BUILD ERROR"/>
 	    <echo level="error" message="  "/>
 		<echo level="error" message="  Directory '${jboss.home}' (or '${sample.deploy}') doesn't exist."/>
+		<echo level="error" message="  Please edit and fix your 'build.properties' configuration file."/>
+		<echo level="error" message="==============================================================================="/>
+	</target>
+	
+	<!--
+	 ! Compile Java sources.
+	 !-->	
+	<target name="build.java">
+		<mkdir dir="${bin.java}"/>
+		<javac srcdir="${src.java}" destdir="${bin.java}"/>
+	</target>
+	
+	<!--
+	 ! Compile Flex sources and create a HTML wrapper.
+	 !-->	
+	<target name="build.flex" depends="fail.flex" if="flex.home.exists">
+		
+		<property name="FLEX_HOME" value="${flex.home}"/>
+		<taskdef resource="flexTasks.tasks" classpath="${flex.home}/ant/lib/flexTasks.jar" />
+		
+		<mkdir dir="${bin.flex}"/>
+		<mxmlc
+            file="${src.flex}/${sample.name}.mxml"
+            output="${bin.flex}/${sample.name}.swf"
+            services="war/WEB-INF/flex/services-config.xml"
+            context-root="/${sample.name}"
+            keep-generated-actionscript="false"
+            debug="false"
+            incremental="true"
+            use-network="false">
+
+            <source-path path-element="${flex.home}/frameworks"/>
+            <load-config filename="${flex.home}/frameworks/flex-config.xml"/>
+        </mxmlc>
+
+		<html-wrapper
+			title="GraniteDS Hello World Sample (POJO remote service)"
+		    output="${bin.flex}"
+			file="${sample.name}.html"
+		    application="${sample.name}"
+		    swf="${sample.name}"
+		    version-major="10"
+		    version-minor="0"
+		    version-revision="0"
+		    history="true"
+		    height="100%"
+			width="100%"
+		    bgcolor="#ffffff"
+		/>
+	</target>
+	
+	<!--
+	 ! Compile Java and Flex sources.
+	 !-->	
+	<target name="build.java.flex" depends="build.java,build.flex"/>
+
+	<!--
+	 ! Check Flex SDK installation directory.
+	 !-->
+	<target name="check.flex">
+		<condition property="flex.home.exists">
+			<and>
+      			<available file="${flex.home}" type="dir"/>
+	      		<available file="${flex.home}/ant/lib/flexTasks.jar" type="file"/>
+			</and>
+    	</condition>
+	</target>
+	
+	<!--
+	 ! Display error message (configuration issue).
+	 !-->
+	<target name="fail.flex" depends="check.flex" unless="flex.home.exists">
+		<echo level="error" message="==============================================================================="/>
+	    <echo level="error" message="  FATAL BUILD ERROR"/>
+	    <echo level="error" message="  "/>
+		<echo level="error" message="  Directory '${flex.home}' (or file '${flex.home}/ant/lib/flexTasks.jar') doesn't exist."/>
 		<echo level="error" message="  Please edit and fix your 'build.properties' configuration file."/>
 		<echo level="error" message="==============================================================================="/>
 	</target>

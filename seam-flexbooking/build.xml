@@ -10,17 +10,10 @@
 	<property name="war.dir" value="${ear.dir}/${sample.name}.war"/>
 	<property name="jar.file" value="${ear.dir}/${sample.name}.jar"/>
 
-	<!--
-	 ! Check JBoss installation directory.
-	 !-->
-	<target name="check.jboss">
-		<condition property="jboss.home.exists">
-			<and>
-      			<available file="${jboss.home}" type="dir"/>
-	      		<available file="${sample.deploy}" type="dir"/>
-			</and>
-    	</condition>
-	</target>
+	<property name="src.flex" value="flex"/>
+	<property name="src.java" value="java"/>
+	<property name="bin.flex" value="bin-flex"/>
+	<property name="bin.java" value="bin-java"/>
 	
 	<!--
 	 ! Build and deploy the sample application.
@@ -58,14 +51,26 @@
 		<mkdir dir="${war.dir}"/>
 		<copy todir="${war.dir}">
 			<fileset dir="ear/war" includes="**"/>
-			<fileset dir="bin-flex" includes="**"/>
+			<fileset dir="${bin.flex}" includes="**" excludes="**/*.cache"/>
 		</copy>
 
 		<jar destfile="${jar.file}">
 			<fileset dir="ear/jar" includes="**"/>
-			<fileset dir="bin-java" includes="**"/>
+			<fileset dir="${bin.java}" includes="**"/>
 		</jar>
 		
+	</target>
+
+	<!--
+	 ! Check JBoss installation directory.
+	 !-->
+	<target name="check.jboss">
+		<condition property="jboss.home.exists">
+			<and>
+      			<available file="${jboss.home}" type="dir"/>
+	      		<available file="${sample.deploy}" type="dir"/>
+			</and>
+    	</condition>
 	</target>
 	
 	<!--
@@ -78,6 +83,120 @@
 		<echo level="error" message="  Directory '${jboss.home}' (or '${sample.deploy}') doesn't exist."/>
 		<echo level="error" message="  Please edit and fix your 'build.properties' configuration file."/>
 		<echo level="error" message="==============================================================================="/>
+	</target>
+	
+	<!--
+	 ! Compile Java sources.
+	 !-->	
+	<target name="build.java">
+		<mkdir dir="${bin.java}"/>
+		<javac srcdir="${src.java}" destdir="${bin.java}">
+			<classpath>
+				<fileset dir="lib">
+					<include name="ejb3-persistence.jar"/>
+					<include name="hibernate-validator.jar"/>
+					<include name="jboss-javaee.jar"/>
+					<include name="jsf-api.jar"/>
+				</fileset>
+				<fileset dir="ear" includes="jboss-seam.jar"/>
+			</classpath>
+		</javac>
+	</target>
+	
+	<!--
+	 ! Compile Flex sources and create a HTML wrapper.
+	 !-->	
+	<target name="build.flex" depends="fail.flex" if="flex.home.exists">
+		
+		<property name="application.name" value="BookingApp"/>
+		
+		<property name="FLEX_HOME" value="${flex.home}"/>
+		<taskdef resource="flexTasks.tasks" classpath="${flex.home}/ant/lib/flexTasks.jar" />
+		
+		<mkdir dir="${bin.flex}"/>
+		<mxmlc
+            file="${src.flex}/${application.name}.mxml"
+            output="${bin.flex}/${application.name}.swf"
+            keep-generated-actionscript="false"
+            debug="false"
+            incremental="true"
+            use-network="false">
+
+            <source-path path-element="${flex.home}/frameworks"/>
+            <load-config filename="${flex.home}/frameworks/flex-config.xml"/>
+
+			<!-- Standard annotations -->
+			<keep-as3-metadata name="Bindable"/>
+		    <keep-as3-metadata name="Managed"/>
+		    <keep-as3-metadata name="ChangeEvent"/>
+		    <keep-as3-metadata name="NonCommittingChangeEvent"/>
+		    <keep-as3-metadata name="Transient"/>
+
+        	<!-- Tide annotations -->
+        	<keep-as3-metadata name="Id"/>
+        	<keep-as3-metadata name="Version"/>
+        	<keep-as3-metadata name="Name"/>
+        	<keep-as3-metadata name="In"/>
+        	<keep-as3-metadata name="Inject"/>
+        	<keep-as3-metadata name="Out"/>
+        	<keep-as3-metadata name="Observer"/>
+        	<keep-as3-metadata name="ManagedEvent"/>
+        	<keep-as3-metadata name="Destroy"/>
+
+        	<!-- All granite-essentials.swc classes are included in the output swf -->
+            <compiler.include-libraries dir="lib" append="true">
+                <include name="granite-essentials.swc" />
+            </compiler.include-libraries>
+
+        	<!-- Only granite.swc actually used classes are included in the output swf -->
+        	<compiler.library-path dir="lib" append="true">
+        		<include name="granite.swc"/>
+        	</compiler.library-path>
+        </mxmlc>
+
+		<html-wrapper
+			title="Flex Seam Booking Sample - GraniteDS"
+		    output="${bin.flex}"
+			file="${application.name}.html"
+		    application="${application.name}"
+		    swf="${application.name}"
+		    version-major="10"
+		    version-minor="0"
+		    version-revision="0"
+		    history="true"
+		    height="100%"
+			width="100%"
+		    bgcolor="#ffffff"
+		/>
+	</target>
+	
+	<!--
+	 ! Compile Java and Flex sources.
+	 !-->	
+	<target name="build.java.flex" depends="build.java,build.flex"/>
+	
+	<!--
+	 ! Display error message (configuration issue).
+	 !-->
+	<target name="fail.flex" depends="check.flex" unless="flex.home.exists">
+		<echo level="error" message="==============================================================================="/>
+	    <echo level="error" message="  FATAL BUILD ERROR"/>
+	    <echo level="error" message="  "/>
+		<echo level="error" message="  Directory '${flex.home}' (or file '${flex.home}/ant/lib/flexTasks.jar') doesn't exist."/>
+		<echo level="error" message="  Please edit and fix your 'build.properties' configuration file."/>
+		<echo level="error" message="==============================================================================="/>
+	</target>
+
+	<!--
+	 ! Check Flex SDK installation directory.
+	 !-->
+	<target name="check.flex">
+		<condition property="flex.home.exists">
+			<and>
+      			<available file="${flex.home}" type="dir"/>
+	      		<available file="${flex.home}/ant/lib/flexTasks.jar" type="file"/>
+			</and>
+    	</condition>
 	</target>
 	
 </project>
