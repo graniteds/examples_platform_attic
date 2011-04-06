@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="helloworld" default="build.war">
+	
+	<!--
+	 ! Load configuration properties from the 'build.properties' file.
+	 !-->
+	<property file="build.properties"/>
+
+	<property name="war.dir" value="${sample.deploy}/${sample.name}.war"/>
+
+	<!--
+	 ! Check JBoss installation directory.
+	 !-->
+	<target name="check.jboss">
+		<condition property="jboss.home.exists">
+			<and>
+      			<available file="${jboss.home}" type="dir"/>
+	      		<available file="${sample.deploy}" type="dir"/>
+			</and>
+    	</condition>
+	</target>
+	
+	<!--
+	 ! Build and deploy the sample application.
+	 !-->
+	<target name="build.war" depends="fail.jboss" if="jboss.home.exists">
+
+		<echo message="==============================================================================="/>
+	    <echo message="  DEPLOYING SAMPLE APPLICATION..."/>
+	    <echo message="  "/>
+	    <echo message="  Found in build.properties:"/>
+	    <echo message="  "/>
+	    <echo message="    jboss.home = '${jboss.home}'"/>
+	    <echo message="    sample.deploy = '${sample.deploy}'"/>
+		<echo message="    sample.name = '${sample.name}'"/>
+	    <echo message="  "/>
+	    <echo message="  Deploying to:"/>
+	    <echo message="  "/>
+	    <echo message="    war.dir = '${war.dir}'"/>
+	    <echo message="  "/>
+	    <echo message="==============================================================================="/>
+
+		<mkdir dir="${war.dir}"/>
+		<copy todir="${war.dir}">
+			<fileset dir="war" includes="**"/>
+			<fileset dir="bin-flex" includes="**"/>
+		</copy>
+		<copy todir="${war.dir}/WEB-INF/classes">
+			<fileset dir="bin-java" includes="**"/>
+		</copy>
+		
+	</target>
+	
+	<!--
+	 ! Display error message (configuration issue).
+	 !-->
+	<target name="fail.jboss" depends="check.jboss" unless="jboss.home.exists">
+		<echo level="error" message="==============================================================================="/>
+	    <echo level="error" message="  FATAL BUILD ERROR"/>
+	    <echo level="error" message="  "/>
+		<echo level="error" message="  Directory '${jboss.home}' (or '${sample.deploy}') doesn't exist."/>
+		<echo level="error" message="  Please edit and fix your 'build.properties' configuration file."/>
+		<echo level="error" message="==============================================================================="/>
+	</target>
+	
+</project>

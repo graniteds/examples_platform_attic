@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application
+	xmlns="*"
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	pageTitle="GraniteDS Chat Sample">
+
+	<fx:Style source="style.css" />
+	
+	<fx:Declarations>
+		<!--
+			Validate the entered nickname when connecting.
+		 -->
+		<mx:StringValidator id="nicknameValidator" source="{iNickname}" property="text" minLength="2" maxLength="12" />
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import flashx.textLayout.elements.ParagraphElement;
+			import flashx.textLayout.elements.SpanElement;
+			
+			import mx.events.ValidationResultEvent;
+			import mx.messaging.events.MessageEvent;
+			import mx.messaging.messages.AsyncMessage;
+			import mx.utils.StringUtil;
+			
+			import org.granite.gravity.Consumer;
+			import org.granite.gravity.Producer;
+		
+			// Declare a Gravity Consumer (receive messages) and a Producer (send messages).
+			private var consumer:Consumer = null;
+			private var producer:Producer = null;
+		
+			// Nick name of the chater and sent message counter.
+			[Bindable]
+			private var nickname:String = "";
+			private var msgIndex:int = 1;
+			
+			// Connect the Consumer and the Producer to the 'gravity' destination
+			// (see services-config.xml) and the 'discussion' topic.
+			private function connect():void {
+				nickname = iNickname.text;
+				if (nicknameValidator.validate().type === ValidationResultEvent.VALID) {
+				
+					consumer = new Consumer();
+					consumer.destination = "gravity";
+					consumer.topic = "discussion";
+					consumer.subscribe();
+					consumer.addEventListener(MessageEvent.MESSAGE, messageHandler);
+					
+					producer = new Producer();
+					producer.destination = "gravity";
+					producer.topic = "discussion";
+					var msg:AsyncMessage = new AsyncMessage();
+					msg.body = '[' + nickname + ' has just connected]';
+					producer.send(msg);
+					
+					this.currentState = "chat";
+				}
+			}
+			
+			// Listener method for the Consumer message events: receive incoming messages.
+			private function messageHandler(event:MessageEvent):void {
+				var msg:AsyncMessage = event.message as AsyncMessage;
+				var message:String = msg.body as String;
+				
+				while (vMessages.textFlow.numChildren > 20)
+					vMessages.textFlow.removeChildAt(0);
+				
+				var paragraph:ParagraphElement = new ParagraphElement();
+				var span:SpanElement = new SpanElement();
+				span.text = message;
+				paragraph.addChild(span);
+				vMessages.textFlow.addChild(paragraph);
+			}
+			
+			// Send new message from the Producer.
+			private function send():void {
+				var message:String = StringUtil.trim(iNewMessage.text);
+				if (message.length > 0) {
+					var msg:AsyncMessage = new AsyncMessage();
+					msg.body = '[' + nickname + ' #' + (msgIndex++) + '] ' + message;
+					producer.send(msg);
+				}
+				iNewMessage.text = "";
+			}
+			
+			// Disconnect the Consumer and the Producer from the 'gravity' destination
+			// (unsubscribing from the 'discussion' topic is implicit).
+			private function disconnect():void {
+				consumer.disconnect();
+				consumer = null;
+				
+				producer.disconnect();
+				producer = null;
+				
+				msgIndex = 1;
+				
+				while (vMessages.textFlow.numChildren > 0)
+					vMessages.textFlow.removeChildAt(0);
+	
+				this.currentState = "connect";
+			}
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="connect"/>
+		<s:State name="chat"/>
+	</s:states>
+	
+	<s:Group width="100%" height="100%">
+		<s:layout>
+			<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle"/>
+		</s:layout>
+		
+		<!--
+			Connection pannel ('connect' state).
+		 -->
+		<s:Panel title="GraniteDS Chat Sample" includeIn="connect" width="250">
+			<s:layout>
+				<s:VerticalLayout paddingLeft="16" paddingRight="16" paddingTop="16" paddingBottom="16"/>
+			</s:layout>
+			
+			<s:Label text="Enter your nickname:"/>
+			<s:TextInput id="iNickname" text="{nickname}" enter="connect()" width="100%"/>
+			
+			<s:controlBarContent>
+				<s:Button id="bConnect" label="Connect" click="connect()" />
+			</s:controlBarContent>
+		</s:Panel>
+		
+		<!--
+			Chat pannel ('chat' state).
+		 -->
+		<s:Panel title="GraniteDS Chat Sample - {nickname}" includeIn="chat">
+			<s:layout>
+				<s:VerticalLayout
+					paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10"
+					horizontalAlign="center"/>
+			</s:layout>
+
+			<s:RichText id="vMessages" width="400" height="300" textAlign="left" />
+			
+			<s:controlBarContent>
+				<s:TextInput id="iNewMessage" enter="send()" width="100%"/>
+				<s:Button id="bSend" label="Send" click="send()" />
+				<s:Button id="bDisconnect" label="Quit" click="disconnect()" />
+			</s:controlBarContent>
+		</s:Panel>
+		
+	</s:Group>
+
+</s:Application>

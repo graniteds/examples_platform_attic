@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application
+	xmlns="*"
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	pageTitle="GraniteDS Hello World Sample (POJO remote service)"
+	viewSourceURL="srcview/index.html">
+	
+	<fx:Style source="style.css"/>
+
+	<fx:Declarations>
+		<!--
+			Declare the remote service (see HelloWorldService.java and services-config.xml)
+		-->
+		<s:RemoteObject id="srv" destination="helloWorldService"/>
+	</fx:Declarations>
+	
+	<s:Group width="100%" height="100%">
+		<s:layout>
+			<s:VerticalLayout horizontalAlign="center" verticalAlign="middle"/>
+		</s:layout>
+		
+		<s:Panel title="GraniteDS Hello World Sample" width="250">
+			<s:layout>
+				<s:VerticalLayout paddingLeft="16" paddingRight="16" paddingTop="16" paddingBottom="16" />
+			</s:layout>
+			
+			<s:Label text="Enter your name:"/>
+			<s:TextInput id="nameInput" enter="srv.sayHello(nameInput.text)" width="100%"/>
+			
+			<!--
+				Call the sayHello method on the remote service with the text entered in
+				the 'nameInput' TextInput.
+			-->
+			<s:controlBarContent>
+				<s:Button label="Say Hello" click="srv.sayHello(nameInput.text)"/>
+			</s:controlBarContent>
+		</s:Panel>
+		
+		<!--
+			Display the result of the sayHello method call.
+		-->
+		<s:Label id="result" text="{srv.sayHello.lastResult}" fontSize="26" paddingTop="20"/>
+		
+	</s:Group>
+
+</s:Application>
