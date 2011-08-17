@@ -12,9 +12,18 @@
 	<property name="bin.flex" value="bin-flex"/>
 	
 	<!--
+	 ! Copy libs
+	 !-->
+	<target name="copy.libs.war" if="lib.dir">
+		<copy todir="${war.dir}/WEB-INF/lib" overwrite="true">
+			<fileset dir="${lib.dir}" includesfile="granite.jar"/>
+		</copy>
+	</target>
+	
+	<!--
 	 ! Build and deploy the sample application.
 	 !-->
-	<target name="build.war" depends="fail.jboss" if="jboss.home.exists">
+	<target name="build.war" depends="fail.jboss, copy.libs.war" if="jboss.home.exists">
 
 		<echo message="==============================================================================="/>
 	    <echo message="  DEPLOYING SAMPLE APPLICATION..."/>
