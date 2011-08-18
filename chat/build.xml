@@ -16,7 +16,7 @@
 	 !-->
 	<target name="copy.libs.war" if="lib.dir">
 		<copy todir="${war.dir}/WEB-INF/lib" overwrite="true">
-			<fileset dir="${lib.dir}" includesfile="granite.jar"/>
+			<fileset dir="${lib.dir}" includes="granite.jar"/>
 		</copy>
 	</target>
 	
