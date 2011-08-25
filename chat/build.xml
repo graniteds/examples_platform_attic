@@ -12,18 +12,9 @@
 	<property name="bin.flex" value="bin-flex"/>
 	
 	<!--
-	 ! Copy libs
-	 !-->
-	<target name="copy.libs.war" if="lib.dir">
-		<copy todir="${war.dir}/WEB-INF/lib" overwrite="true">
-			<fileset dir="${lib.dir}" includes="granite.jar"/>
-		</copy>
-	</target>
-	
-	<!--
 	 ! Build and deploy the sample application.
 	 !-->
-	<target name="build.war" depends="fail.jboss, copy.libs.war" if="jboss.home.exists">
+	<target name="build.war" depends="fail.jboss" if="jboss.home.exists">
 
 		<echo message="==============================================================================="/>
 	    <echo message="  DEPLOYING SAMPLE APPLICATION..."/>
@@ -40,6 +31,7 @@
 	    <echo message="  "/>
 	    <echo message="==============================================================================="/>
 
+		<mkdir dir="${sample.deploy}"/>
 		<mkdir dir="${war.dir}"/>
 		<copy todir="${war.dir}">
 			<fileset dir="war" includes="**"/>
@@ -70,18 +62,9 @@
 	</target>
 	
 	<!--
-	 ! Copy libs
-	 !-->
-	<target name="copy.libs.build" if="lib.dir">
-		<copy todir="lib" overwrite="true">
-			<fileset dir="${lib.dir}" includes="*.swc"/>
-		</copy>
-	</target>
-	
-	<!--
 	 ! Compile Flex sources and create a HTML wrapper.
 	 !-->	
-	<target name="build.flex" depends="fail.flex,copy.libs.build" if="flex.home.exists">
+	<target name="build.flex" depends="fail.flex" if="flex.home.exists">
 		
 		<property name="FLEX_HOME" value="${flex.home}"/>
 		<taskdef resource="flexTasks.tasks" classpath="${flex.home}/ant/lib/flexTasks.jar" />

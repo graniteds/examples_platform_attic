@@ -14,18 +14,9 @@
 	<property name="bin.java" value="bin-java"/>
 	
 	<!--
-	 ! Copy libs
-	 !-->
-	<target name="copy.libs.war" if="lib.dir">
-		<copy todir="${war.dir}/WEB-INF/lib">
-			<fileset dir="${lib.dir}" includes="granite.jar"/>
-		</copy>
-	</target>
-	
-	<!--
 	 ! Build and deploy the sample application.
 	 !-->
-	<target name="build.war" depends="fail.jboss, copy.libs.war" if="jboss.home.exists">
+	<target name="build.war" depends="fail.jboss" if="jboss.home.exists">
 
 		<echo message="==============================================================================="/>
 	    <echo message="  DEPLOYING SAMPLE APPLICATION..."/>
@@ -42,6 +33,7 @@
 	    <echo message="  "/>
 	    <echo message="==============================================================================="/>
 
+		<mkdir dir="${sample.deploy}"/>
 		<mkdir dir="${war.dir}"/>
 		<copy todir="${war.dir}">
 			<fileset dir="war" includes="**"/>

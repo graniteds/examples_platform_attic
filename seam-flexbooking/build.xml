@@ -17,22 +17,9 @@
 	
 	
 	<!--
-	 ! Copy libs
-	 !-->
-	<target name="copy.libs.ear" if="lib.dir">
-		<copy todir="${ear.dir}/lib" overwrite="true">
-			<fileset dir="${lib.dir}">
-				<include name="granite.jar"/>
-				<include name="granite-hibernate.jar"/>
-				<include name="granite-seam21.jar"/>
-			</fileset>
-		</copy>
-	</target>
-	
-	<!--
 	 ! Build and deploy the sample application.
 	 !-->
-	<target name="build.ear" depends="fail.jboss,copy.libs.ear" if="jboss.home.exists">
+	<target name="build.ear" depends="fail.jboss" if="jboss.home.exists">
 
 		<echo message="==============================================================================="/>
 	    <echo message="  DEPLOYING SAMPLE APPLICATION..."/>
@@ -183,18 +170,9 @@
 	</target>
 	
 	<!--
-	 ! Copy libs
-	 !-->
-	<target name="copy.libs.build" if="lib.dir">
-		<copy todir="lib" overwrite="true">
-			<fileset dir="${lib.dir}" includes="*.swc"/>
-		</copy>
-	</target>
-	
-	<!--
 	 ! Compile Java and Flex sources.
 	 !-->	
-	<target name="build.java.flex" depends="copy.libs.build,build.java,build.flex"/>
+	<target name="build.java.flex" depends="build.java,build.flex"/>
 	
 	<!--
 	 ! Display error message (configuration issue).
